@@ -1,3 +1,19 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Main Folder Notes:
+This folder includes the main code of fast-TDA (ellipse fitting) and the data from the PCB shock test.
+The data include the excitation signal (impact), imposed by the shaker and two acquired signals from the base plate and the main PCB.
+
+## What this folder contains
+1- data.csv: This CSV file contains the excitation as the imposed voltage from the shaker and two acceleration signals from the PCB (Acc1) as output and from the base plate (ACC0) as input signal.
+2-fast_tda_demo.m: 
+
+
+
+
+
+
+
+
 # Paper 2026 FPGA-deployable Approximate Topological Framework
 working repository for the 2026 SMASIS paper "FPGA-deployable Approximate Topological Framework for Low-latency Change-point Detection in PCB Shock and Vibration Response."
 
@@ -32,11 +48,7 @@ Cite this as:
 QR code for repo.
 </p>
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# Main Folder Notes:
 
-
-## What this folder contains
 
 
 
