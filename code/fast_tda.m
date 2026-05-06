@@ -8,7 +8,7 @@
 % plots all data and saves to a video file
 
 % read data
-data = readtable('data_2.csv');
+data = readtable('data.csv');
 time = data.Time_s;
 output = data.Output;
 %if ismember('Var1', data.Properties.VariableNames)
