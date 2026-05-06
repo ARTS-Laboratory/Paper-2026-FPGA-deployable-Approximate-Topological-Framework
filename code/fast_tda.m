@@ -8,9 +8,9 @@
 % plots all data and saves to a video file
 
 % read data
-data = readtable('data.csv');
+data = readtable('processed_clean.csv');
 time = data.Time_s;
-output = data.Output;
+output = data.Acc1_filt;
 %if ismember('Var1', data.Properties.VariableNames)
     %time = data.Var1;
     %output = data.Var2;
@@ -227,38 +227,45 @@ end
 close(video);
 %close(fig);
 
-function p = conic_to_parametric(a)
-    % Very basic conic → parametric conversion (center, axes, angle)
-    % You can replace this with your own version if you have a better one
-    A = a(1); B = a(2); C = a(3); D = a(4); E = a(5); F = a(6);
-    
-    % Center
-    denom = B^2 - 4*A*C;
-    if abs(denom) < 1e-12
-        p = zeros(5,1); return;
+function p = conic_to_parametric(params)
+    a = params(1); b = params(2); c = params(3);
+    d = params(4); e = params(5); f = params(6);
+
+    delta = b^2 - 4*a*c;
+    if delta >= 0 || abs(a) < 1e-10 || abs(c) < 1e-10
+        p = nan(5,1); return;
     end
-    cx = (2*C*D - B*E) / denom;
-    cy = (2*A*E - B*D) / denom;
-    
-    % Angle
-    if abs(B) < 1e-12
-        theta = 0;
+
+    denom = b^2 - 4*a*c;
+    center_x = (2*c*d - b*e) / denom;
+    center_y = (2*a*e - b*d) / denom;
+
+    if abs(b) < 1e-10
+        angle = 0;
+    elseif abs(a - c) < 1e-10
+        angle = pi/4;
     else
-        theta = 0.5 * atan2(B, A - C);
+        angle = 0.5 * atan(b / (a - c));
     end
-    
-    % Semi-axes (approximate)
-    T = A + C;
-    R = sqrt((A - C)^2 + B^2);
-    lambda1 = (T + R)/2;
-    lambda2 = (T - R)/2;
-    if lambda1 <= 0 || lambda2 <= 0
-        p = zeros(5,1); return;
+
+    a_prime = a*center_x^2 + b*center_x*center_y + c*center_y^2 + d*center_x + e*center_y + f;
+
+    lambda1 = (a + c + sqrt((a - c)^2 + b^2)) / 2;
+    lambda2 = (a + c - sqrt((a - c)^2 + b^2)) / 2;
+    semi_major = sqrt(-a_prime / lambda1);
+    semi_minor = sqrt(-a_prime / lambda2);
+
+    if semi_minor > semi_major || semi_major < 1e-5 || semi_minor < 1e-5
+        temp = semi_major;
+        semi_major = semi_minor;
+        semi_minor = temp;
+        angle = angle + pi/2;
     end
-    semi_major = sqrt(1/lambda2);
-    semi_minor = sqrt(1/lambda1);
-    
-    p = [cx; cy; semi_major; semi_minor; theta];
+    if semi_major > 1e5 || semi_minor > 1e5
+        semi_major = NaN; semi_minor = NaN;
+    end
+
+    p = [center_x; center_y; semi_major; semi_minor; angle];
 end
 
 function plot_ellipse(P, params, ax)
