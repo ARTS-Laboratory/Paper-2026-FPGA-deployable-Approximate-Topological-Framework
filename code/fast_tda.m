@@ -110,7 +110,8 @@ for j = 1:5
     line_handles_parametric(j) = plot(ax4, NaN, NaN, 'LineWidth', 1);
     hold(ax4, 'on');
 end
-legend(ax4, {"center_x", "center_y", "semi-major", "semi-minor", "angle"});
+lgd4 = legend(ax4, {"center_x", "center_y", "semi-major", "semi-minor", "angle"});
+lgd4.AutoUpdate = 'off';
 xlabel(ax4, "time");
 xlim(ax4, [min(time) max(time)]);
 
@@ -203,7 +204,7 @@ for i = 1:step_size:num_windows
                       min(ellipse_params_parametric,[],"all"), ...
                       max(ellipse_params_parametric,[],"all"), ...
                       max(ellipse_params_parametric,[],"all")];
-            patch(ax4, x_rect, y_rect, [0.5 0.7 1], 'EdgeColor', 'r', 'LineWidth', 1);
+            %patch(ax4, x_rect, y_rect, [0.5 0.7 1], 'EdgeColor', 'r', 'LineWidth', 1, 'HandleVisibility', 'off');
         end
     catch
         % fallback if conic_to_parametric fails
