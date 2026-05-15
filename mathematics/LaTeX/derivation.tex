@@ -38,11 +38,11 @@ The quadratic constraint can be expressed in the constraint matrix form C (4) to
 \end{equation}
 Where S is the scatter matrix DT * D.
 
-\\The objective of this project is to implement the ellipse fitting onto an FPGA board using Vitis HLS. The purpose will be to compute the ellipse fitting over shock/vibration data generated to detect abnormalities. When first exploring multiple ways to implement the fitting, one of the first methods, the Fitzgibbon method.
+The objective of this project is to implement the ellipse fitting onto an FPGA board using Vitis HLS. The purpose will be to compute the ellipse fitting over shock/vibration data generated to detect abnormalities. When first exploring multiple ways to implement the fitting, one of the first methods, the Fitzgibbon method.
 
-\\This method essentially fits an ellipse to a set of scattered 2D data points(e.g., vibration data). However, this method has proven to be unreliable for hardware use due to how expensive it is to use on hardware. To resolve this, other decomposition methods were considered to replaced the Fitzgibbon method and help solve the general eigenvalue problem, while still being least expensive on the hardware.  
+This method essentially fits an ellipse to a set of scattered 2D data points(e.g., vibration data). However, this method has proven to be unreliable for hardware use due to how expensive it is to use on hardware. To resolve this, other decomposition methods were considered to replaced the Fitzgibbon method and help solve the general eigenvalue problem, while still being least expensive on the hardware.  
 
-\\The $LDL^{T}\,$ factorization is a decomposition method that is closely related to the classical Cholesky factorization. Where L is the lower triangular matrix, D is the diagonal matrix, LT is the upper triangular matrix. This can be written as: 
+The $LDL^{T}\,$ factorization is a decomposition method that is closely related to the classical Cholesky factorization. Where L is the lower triangular matrix, D is the diagonal matrix, LT is the upper triangular matrix. This can be written as: 
 \begin{equation}
     S = LDL^{T}
 \end{equation}
@@ -201,21 +201,29 @@ which is solved efficiently using the cyclic Jacobi method. The resulting approa
 The cyclic Jacobi algorithm iteratively applies Givens rotations to diagonalize \(A\). For each iteration, the largest off-diagonal element \(A_{pq}\) is selected, and a rotation is applied to zero it while preserving symmetry. After convergence, the eigenvector corresponding to the smallest positive eigenvalue is scaled to enforce the constraint \(4ac - b^2 = 1\), yielding the final ellipse coefficients \([a, b, c, d, e, f]\).
 
 This Schur-complement-based method eliminates the need for LDL$^T$ factorization entirely and is the core of the implemented Vitis HLS kernel.
- \\Initially, the Jacobi method takes the largest off-diagonal of the symmetric matrix Apq. The two indices (p,q) identify the plane of rotation, which means that the Jacobi method applies a rotation angle in the plane (p,q), which makes Apq = 0.
+ 
+Initially, the Jacobi method takes the largest off-diagonal element of the symmetric matrix $A_{pq}$. The two indices $(p,q)$ identify the plane of rotation, which means that the Jacobi method applies a rotation angle in the plane $(p,q)$ such that $A_{pq}=0$.
+
 \begin{equation}
-    (p, q) = \underset{p < q}{\operatorname{arg\,max}} |A_{pq}|
+(p, q) = \underset{p < q}{\operatorname{arg\,max}} |A_{pq}|
 \end{equation}
+
 \begin{equation}
-    \tan(2\theta) = \frac{2A_{pq}}{A_{qq} - A_{pp}}
+\tan(2\theta) = \frac{2A_{pq}}{A_{qq} - A_{pp}}
 \end{equation}
-t = 
+
+\begin{equation}
+t =
 \begin{cases}
-\frac{1}{\tau + \sqrt{1 + \tau^{2}}}, & \tau \ge 0, \\
+\frac{1}{\tau + \sqrt{1 + \tau^{2}}}, & \tau \ge 0, \\[6pt]
 -\frac{1}{-\tau + \sqrt{1 + \tau^{2}}}, & \tau < 0,
 \end{cases}
-\quad \text{where } \tau = \frac{A_{qq} - A_{pp}}{2A_{pq}}.
+\qquad
+\text{where }
+\tau = \frac{A_{qq} - A_{pp}}{2A_{pq}}.
+\end{equation}
 
-\\For the rotation in the $(p, q)$ plane, only the $p$-th and $q$-th rows and columns of $A$ are modified. 
+For the rotation in the $(p, q)$ plane, only the $p$-th and $q$-th rows and columns of $A$ are modified. 
 The updated diagonal and off-diagonal elements are computed as:
 \begin{align}
 A'_{pp} &= c^{2}A_{pp} - 2scA_{pq} + s^{2}A_{qq}, \\
